@@ -1,1 +1,1 @@
-# The first file of the elevator Project
+# The first and only file of the elevator Project
