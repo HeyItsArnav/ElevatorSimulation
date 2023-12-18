@@ -191,7 +191,7 @@ void building :: tick()
     }
     for(int i=0;i<5;i++)
     spawn();
-    system("clear");
+    system("cls");
 }
 //////////////////////////////////////////////////
 int main()
@@ -200,7 +200,7 @@ int main()
     while(true)
     {
         xyz.tick();
-        sleep(500);
+        sleep(1);
     }
     return 0;
 }
