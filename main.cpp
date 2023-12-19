@@ -97,7 +97,7 @@ void building :: construct()
         {
             if((members[j].current_floor==i)&&(members[j].travelling!=0))
             {
-                cout << " I ";
+                cout << " I "<< members[j].lift.current_floor;
             }
         }
         cout << endl;
@@ -119,15 +119,15 @@ void building :: fastestTime(people human)
             minindex = i;
         }
     }
-    buffer = lifts[min].last_floor;
-    int dir = (lifts[min].last_floor-lifts[min].current_floor)/abs(lifts[min].last_floor-lifts[min].current_floor);
-    if(dir*buffer>dir*lifts[min].last_floor)//Dont ask me what I did here, Even I do not know
+    buffer = human.current_floor;
+    int dir = (lifts[minindex].last_floor-lifts[minindex].current_floor)/abs(lifts[minindex].last_floor-lifts[minindex].current_floor);
+    if(dir*buffer>dir*lifts[minindex].last_floor)//Dont ask me what I did here, Even I do not know
     {
-        lifts[min].last_floor=buffer;
+        lifts[minindex].last_floor=buffer;
     }
-    else if(dir*buffer<dir*lifts[min].current_floor)
+    else if(dir*buffer<dir*lifts[minindex].current_floor)
     {
-        lifts[min].otherDest=buffer;
+        lifts[minindex].otherDest=buffer;
     }
 }
 void building :: spawn()
@@ -140,7 +140,7 @@ void building :: spawn()
         if(members[mem].destination!=members[mem].current_floor)
         {
             members[mem].travelling = (members[mem].destination - members[mem].current_floor)>0?1:-1;
-            fastestTime(members[mem]);   
+            fastestTime(members[mem]);
         }
     }
 }
@@ -149,15 +149,19 @@ void building :: spawn()
 void building :: tick()
 {
     system("clear");
-    for(int i=0;i<5;i++)
-    spawn();
+    for(int i=0;i<10;i++)
+        spawn();
     //moving every lift
     for(int i=0;i<LIFTS;i++)
     {
-        int dir = (lifts[i].last_floor-lifts[i].current_floor)/abs(lifts[i].last_floor-lifts[i].current_floor);
-        if((dir>0)&&(lifts[i].current_floor+1<FLOORS))
+        int dir;
+        if(lifts[i].last_floor!=lifts[i].current_floor)
+        dir = (lifts[i].last_floor-lifts[i].current_floor)/abs(lifts[i].last_floor-lifts[i].current_floor);
+        else
+        dir = 0;
+        if((dir>0)&&(lifts[i].current_floor<FLOORS-1))
         {
-            lifts[i].current_floor+=1;
+            lifts[i].current_floor++;
         }
         else if(dir<0&&lifts[i].current_floor>0)
         {
@@ -165,15 +169,7 @@ void building :: tick()
         }
         else if(lifts[i].current_floor==lifts[i].last_floor)
         {
-            if(lifts[i].otherDest!=-1)
-            {
-                lifts[i].last_floor = lifts[i].otherDest;
-                lifts[i].otherDest = -1;
-            }
-            else
-            {
-                lifts[i].last_floor = lifts[i].current_floor==0?(FLOORS-1):0;
-            }
+            lifts[i].last_floor = lifts[i].otherDest == -1?lifts[i].current_floor:lifts[i].otherDest;
         }
     }
     //put passenger on lift
