@@ -97,12 +97,11 @@ void building :: construct()
         {
             if((members[j].current_floor==i)&&(members[j].travelling!=0)&&(members[j].travelling!=2))
             {
-                cout << " I "<< members[j].travelling;
+                cout << " I ";
             }
         }
         cout << endl;
     }
-    cout << lifts[0].current_floor << " " << lifts[0].last_floor<<" Delivered: " << delivered;
 }
 void building :: fastestTime(people human)
 {
@@ -149,7 +148,7 @@ void building :: spawn()
 void building :: tick()
 {
     system("clear");
-    for(int i=0;i<10;i++)
+    for(int i=0;i<3;i++)
         spawn();
     //moving every lift
     for(int i=0;i<LIFTS;i++)
@@ -192,7 +191,7 @@ void building :: tick()
                 }
                 else
                 {
-                    if(members[i].destination==members[i].lift.current_floor)
+                    if((members[i].destination==lifts[j].current_floor)&&(members[i].travelling==2))
                     {
                         delivered++;
                         members[i].travelling = 0;
