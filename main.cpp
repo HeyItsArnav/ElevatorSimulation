@@ -95,9 +95,9 @@ void building :: construct()
         cout << " ||";
         for(int j=0;j<RESIDENTS;j++)
         {
-            if((members[j].current_floor==i)&&(members[j].travelling!=0))
+            if((members[j].current_floor==i)&&(members[j].travelling!=0)&&(members[j].travelling!=2))
             {
-                cout << " I "<< members[j].lift.current_floor;
+                cout << " I "<< members[j].travelling;
             }
         }
         cout << endl;
@@ -179,23 +179,28 @@ void building :: tick()
         {
             for(int j=0;j<LIFTS;j++)
             {
-                if(members[i].current_floor==lifts[i].current_floor)
+                if(members[i].travelling!=2)
                 {
-                    int dir = (lifts[j].last_floor-lifts[j].current_floor)/abs(lifts[j].last_floor-lifts[j].current_floor);
-                    if(dir==members[i].travelling)
+                    if(members[i].current_floor==lifts[j].current_floor)
                     {
-                        members[i].lift = lifts[j];
-                        members[i].travelling = 0;
-                        members[i].lift.current_floor = members[i].current_floor;
-                        break;
+                        int dir = (lifts[j].last_floor-lifts[j].current_floor)/abs(lifts[j].last_floor-lifts[j].current_floor);
+                        if(dir==members[i].travelling)
+                        {
+                            members[i].travelling = 2;
+                        }
                     }
                 }
-                if(members[i].destination==members[i].lift.current_floor)
+                else
                 {
-                    delivered++;
-                    members[i].current_floor = -1;
-                    members[i].destination = -1;
+                    if(members[i].destination==members[i].lift.current_floor)
+                    {
+                        delivered++;
+                        members[i].travelling = 0;
+                        members[i].current_floor = -1;
+                        members[i].destination = -1;
+                    }
                 }
+                
             }
         }
     }
