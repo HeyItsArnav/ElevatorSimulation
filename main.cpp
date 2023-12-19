@@ -2,7 +2,7 @@
 #include <unistd.h>
 #include <math.h>
 using namespace std;
-const int LIMIT = 6;
+int delivered = 0;
 class elevator
 {
     public:
@@ -44,7 +44,8 @@ people :: people()
 }
 int people :: time(elevator lift)//Returns the time taken
 {
-    if(((destination)-(current_floor))*lift.direction>0)
+    int dir = (lift.last_floor-lift.current_floor)/abs(lift.last_floor-lift.current_floor);
+    if(((destination)-(current_floor))*dir>0)
     {
         return(abs(lift.current_floor-current_floor));
     }
@@ -81,7 +82,7 @@ building :: building()
 void building :: construct()
 {
     cout << endl;
-    for(int i = FLOORS-1; i>=0;i--)
+    for(int i = 0; i<FLOORS;i++)
     {
         cout << "||\t";
         for(int j=0;j<LIFTS;j++)
@@ -101,7 +102,7 @@ void building :: construct()
         }
         cout << endl;
     }
-    cout << lifts[0].current_floor << " " << lifts[0].last_floor;
+    cout << lifts[0].current_floor << " " << lifts[0].last_floor<<" Delivered: " << delivered;
 }
 void building :: fastestTime(people human)
 {
@@ -136,8 +137,11 @@ void building :: spawn()
     {
         members[mem].current_floor = (rand()%(FLOORS-1));
         members[mem].destination = ((rand()%(FLOORS-1)));
-        members[mem].travelling = (members[mem].destination - members[mem].current_floor)>0?1:-1;
-        fastestTime(members[mem]);
+        if(members[mem].destination!=members[mem].current_floor)
+        {
+            members[mem].travelling = (members[mem].destination - members[mem].current_floor)>0?1:-1;
+            fastestTime(members[mem]);   
+        }
     }
 }
 //////////////////////////////////////////////////
@@ -145,6 +149,8 @@ void building :: spawn()
 void building :: tick()
 {
     system("clear");
+    for(int i=0;i<5;i++)
+    spawn();
     //moving every lift
     for(int i=0;i<LIFTS;i++)
     {
@@ -164,7 +170,10 @@ void building :: tick()
                 lifts[i].last_floor = lifts[i].otherDest;
                 lifts[i].otherDest = -1;
             }
-            //If no error occurs, leave it like that, otherwise if lift glitches, add a condition
+            else
+            {
+                lifts[i].last_floor = lifts[i].current_floor==0?(FLOORS-1):0;
+            }
         }
     }
     //put passenger on lift
@@ -182,11 +191,12 @@ void building :: tick()
                         members[i].lift = lifts[j];
                         members[i].travelling = 0;
                         members[i].lift.current_floor = members[i].current_floor;
+                        break;
                     }
                 }
-                if(members[i].destination==lifts[j].current_floor)
+                if(members[i].destination==members[i].lift.current_floor)
                 {
-                    members[i].travelling = 0;
+                    delivered++;
                     members[i].current_floor = -1;
                     members[i].destination = -1;
                 }
@@ -194,8 +204,6 @@ void building :: tick()
         }
     }
     construct();
-    for(int i=0;i<5;i++)
-    spawn();
 }
 //////////////////////////////////////////////////
 int main()
