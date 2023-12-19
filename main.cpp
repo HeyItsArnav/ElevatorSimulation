@@ -94,14 +94,14 @@ void building :: construct()
         cout << " ||";
         for(int j=0;j<RESIDENTS;j++)
         {
-            if(members[j].current_floor==i)
+            if((members[j].current_floor==i)&&(members[j].travelling!=0))
             {
                 cout << " I ";
             }
         }
         cout << endl;
     }
-
+    cout << lifts[0].current_floor << " " << lifts[0].last_floor;
 }
 void building :: fastestTime(people human)
 {
@@ -119,8 +119,8 @@ void building :: fastestTime(people human)
         }
     }
     buffer = lifts[min].last_floor;
-    int dir = lifts[min].direction;
-    if(lifts[min].direction*buffer>lifts[min].direction*lifts[min].last_floor)//Dont ask me what I did here, Even I do not know
+    int dir = (lifts[min].last_floor-lifts[min].current_floor)/abs(lifts[min].last_floor-lifts[min].current_floor);
+    if(dir*buffer>dir*lifts[min].last_floor)//Dont ask me what I did here, Even I do not know
     {
         lifts[min].last_floor=buffer;
     }
@@ -134,25 +134,26 @@ void building :: spawn()
     int mem = (rand()%RESIDENTS);
     if(members[mem].travelling==0)
     {
-        members[mem].current_floor = (rand()%(FLOORS)-1);
-        members[mem].destination = ((rand()%(FLOORS)-1));
+        members[mem].current_floor = (rand()%(FLOORS-1));
+        members[mem].destination = ((rand()%(FLOORS-1)));
         members[mem].travelling = (members[mem].destination - members[mem].current_floor)>0?1:-1;
+        fastestTime(members[mem]);
     }
 }
 //////////////////////////////////////////////////
 //Every 0.5 seconds in this code, a tick passes
 void building :: tick()
 {
-    construct();
+    system("clear");
     //moving every lift
     for(int i=0;i<LIFTS;i++)
     {
         int dir = (lifts[i].last_floor-lifts[i].current_floor)/abs(lifts[i].last_floor-lifts[i].current_floor);
-        if(dir>0&&lifts[i].current_floor+1<FLOORS)
+        if((dir>0)&&(lifts[i].current_floor+1<FLOORS))
         {
             lifts[i].current_floor+=1;
         }
-        else if(dir<0&&lifts[i].current_floor+1>0)
+        else if(dir<0&&lifts[i].current_floor>0)
         {
             lifts[i].current_floor--;
         }
@@ -171,8 +172,7 @@ void building :: tick()
     {
         if(members[i].travelling!=0)
         {
-            fastestTime(members[i]);
-            for(int j=0;i<LIFTS;j++)
+            for(int j=0;j<LIFTS;j++)
             {
                 if(members[i].current_floor==lifts[i].current_floor)
                 {
@@ -180,18 +180,22 @@ void building :: tick()
                     if(dir==members[i].travelling)
                     {
                         members[i].lift = lifts[j];
+                        members[i].travelling = 0;
+                        members[i].lift.current_floor = members[i].current_floor;
                     }
                 }
-                if(members[i].destination==lifts[i].current_floor)
+                if(members[i].destination==lifts[j].current_floor)
                 {
                     members[i].travelling = 0;
+                    members[i].current_floor = -1;
+                    members[i].destination = -1;
                 }
             }
         }
     }
+    construct();
     for(int i=0;i<5;i++)
     spawn();
-    system("cls");
 }
 //////////////////////////////////////////////////
 int main()
