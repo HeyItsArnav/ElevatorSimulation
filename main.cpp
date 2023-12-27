@@ -1,6 +1,7 @@
 #include <iostream>
 #include <unistd.h>
 #include <math.h>
+#include <iomanip>
 using namespace std;
 int delivered = 0;
 class elevator
@@ -81,10 +82,10 @@ building :: building()
 }
 void building :: construct()
 {
-    cout << endl;
-    for(int i = 0; i<FLOORS;i++)
+    cout << "______________________________________________" << endl;
+    for(int i = FLOORS-1; i>=0;i--)
     {
-        cout << "||\t";
+        cout << setw(2)<< i << "||\t";
         for(int j=0;j<LIFTS;j++)
         {
             if(lifts[j].current_floor==i)
@@ -97,7 +98,14 @@ void building :: construct()
         {
             if((members[j].current_floor==i)&&(members[j].travelling!=0)&&(members[j].travelling!=2))
             {
-                cout << " I ";
+                cout << members[j].destination << " D ";//departure
+            }
+            else if(members[j].travelling == 3 && i==members[j].destination)
+            {
+                cout << members[j].destination << " A ";//Arrived
+                members[j].travelling=0;
+                members[j].current_floor = -1;
+                members[j].destination = -1;
             }
         }
         cout << endl;
@@ -194,9 +202,7 @@ void building :: tick()
                     if((members[i].destination==lifts[j].current_floor)&&(members[i].travelling==2))
                     {
                         delivered++;
-                        members[i].travelling = 0;
-                        members[i].current_floor = -1;
-                        members[i].destination = -1;
+                        members[i].travelling = 3;
                     }
                 }
                 
